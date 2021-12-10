@@ -1,0 +1,16 @@
+* {
+  margin: 0px;
+  padding: 0;
+  background-color: white;
+  font-family: roboto;
+}
+
+h1 {
+  padding: 30px;
+  background-color: lightsteelblue;
+  color: white;
+}
+
+li {
+  margin: 40px 100px;
+}

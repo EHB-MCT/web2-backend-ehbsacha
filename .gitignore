@@ -1,0 +1,8 @@
+# don't send the node modules
+/node_modules
+
+# don't send credentials
+config.json
+
+# some other ignore
+.env
