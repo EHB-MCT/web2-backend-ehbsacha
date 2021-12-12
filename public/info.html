@@ -8,232 +8,280 @@
   <title>documentation</title>
 </head>
 <body>
-  <h1>API documentation</h1>
-  <h2>Root route</h2>
-  <ul>
-    <li>/ = root info page</li>
-  </ul>
-  <h2>User routes</h2>
-  <div class="block">
-    <div class="row top">
-      <div class="type">
-        <p class="get">GET</p>
-      </div>
-      <div class="route">
-        <p>/users</p>
-      </div>
-      <div class="use">
-        <p>Get all users</p>
-      </div>
-      <div class="requirements">
-        <p>none</p>
-      </div>
+  <nav>
+    <p>API documentation</p>
+    <a href="https://web2-gameheaven-ehbsacha.herokuapp.com/">Copy me for the API link</a>
+  </nav>
+  
+  <div class="explanation">
+    <div class="explain">
+      <p class="title">explanation</p>
+      <p class="text">I created my API so people can enjoy my site a litle bit more.</p>
+      <p class="text">You can create users and users can like a boardgame or put it in their owned games by shelving it.</p>
+      <p class="text">The data sended needs to be in JSON like to the right =></p>
     </div>
-    <div class="row">
-      <div class="type">
-        <p class="get">GET</p>
-      </div>
-      <div class="route">
-        <p>/user</p>
-      </div>
-      <div class="use">
-        <p>Login with user credentials</p>
-      </div>
-      <div class="requirements">
-        <p>name, password</p>
-      </div>
+    <div class="code">
+      <p>JSON preview</p>
+      <p>{</p>
+      <p class="indent">"userId": "someId",</p>
+      <p class="indent">"gameId": "someId"</p>
+      <p>}</p>
     </div>
-    <div class="row">
-      <div class="type">
-        <p class="post">POST</p>
-      </div>
-      <div class="route">
-        <p>/user</p>
-      </div>
-      <div class="use">
-        <p>Create a new user</p>
-      </div>
-      <div class="requirements">
-        <p>name, password, email</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="put">PUT</p>
-      </div>
-      <div class="route">
-        <p>/user/name</p>
-      </div>
-      <div class="use">
-        <p>Change username</p>
-      </div>
-      <div class="requirements">
-        <p>name, password, newName</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="put">PUT</p>
-      </div>
-      <div class="route">
-        <p>/user/password</p>
-      </div>
-      <div class="use">
-        <p>Change password</p>
-      </div>
-      <div class="requirements">
-        <p>name, password, newPassword</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="delete">DELETE</p>
-      </div>
-      <div class="route">
-        <p>/user</p>
-      </div>
-      <div class="use">
-        <p>Delete user and its liked/shelved games</p>
-      </div>
-      <div class="requirements">
-        <p>name, password</p>
+  </div>
+
+  <div class="part">
+    <p class="routeName">Root route</p>
+    <div class="block">
+      <div class="row top">
+        <div class="type">
+          <p class="link">LINK</p>
+        </div>
+        <div class="route">
+          <p>/</p>
+        </div>
+        <div class="use">
+          <p>Get redirected to this info page</p>
+        </div>
+        <div class="requirements">
+          <p>none</p>
+        </div>
       </div>
     </div>
   </div>
-  <h2>Like routes</h2>
-  <div class="block">
-    <div class="row top">
-      <div class="type">
-        <p class="get">GET</p>
+  
+  <div class="part">
+    <p class="routeName">User routes</p>
+    <div class="block">
+      <div class="row top">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/users</p>
+        </div>
+        <div class="use">
+          <p>Get all users</p>
+        </div>
+        <div class="requirements">
+          <p>none</p>
+        </div>
       </div>
-      <div class="route">
-        <p>/likes</p>
+      <div class="row">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/user</p>
+        </div>
+        <div class="use">
+          <p>Login with user credentials</p>
+        </div>
+        <div class="requirements">
+          <p>name, password</p>
+        </div>
       </div>
-      <div class="use">
-        <p>Get all liked games of user</p>
+      <div class="row">
+        <div class="type">
+          <p class="post">POST</p>
+        </div>
+        <div class="route">
+          <p>/user</p>
+        </div>
+        <div class="use">
+          <p>Create a new user</p>
+        </div>
+        <div class="requirements">
+          <p>name, password, email</p>
+        </div>
       </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
+      <div class="row">
+        <div class="type">
+          <p class="put">PUT</p>
+        </div>
+        <div class="route">
+          <p>/user/name</p>
+        </div>
+        <div class="use">
+          <p>Change username</p>
+        </div>
+        <div class="requirements">
+          <p>name, password, newName</p>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="post">POST</p>
+      <div class="row">
+        <div class="type">
+          <p class="put">PUT</p>
+        </div>
+        <div class="route">
+          <p>/user/password</p>
+        </div>
+        <div class="use">
+          <p>Change password</p>
+        </div>
+        <div class="requirements">
+          <p>name, password, newPassword</p>
+        </div>
       </div>
-      <div class="route">
-        <p>/like</p>
-      </div>
-      <div class="use">
-        <p>Create a new liked game</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="put">PUT</p>
-      </div>
-      <div class="route">
-        <p>/like</p>
-      </div>
-      <div class="use">
-        <p>Change liked status</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-  </div>
-  <h2>Shelf routes</h2>
-  <div class="block">
-    <div class="row top">
-      <div class="type">
-        <p class="get">GET</p>
-      </div>
-      <div class="route">
-        <p>/shelved</p>
-      </div>
-      <div class="use">
-        <p>Get all shelved games of user</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="post">POST</p>
-      </div>
-      <div class="route">
-        <p>/shelf</p>
-      </div>
-      <div class="use">
-        <p>Create a new shelved game</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="put">PUT</p>
-      </div>
-      <div class="route">
-        <p>/shelf</p>
-      </div>
-      <div class="use">
-        <p>Change shelved status</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-  </div>
-  <h2>Like and shelf common routes</h2>
-  <div class="block">
-    <div class="row top">
-      <div class="type">
-        <p class="get">GET</p>
-      </div>
-      <div class="route">
-        <p>/games</p>
-      </div>
-      <div class="use">
-        <p>Get all likes and shelfs</p>
-      </div>
-      <div class="requirements">
-        <p>none</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="get">GET</p>
-      </div>
-      <div class="route">
-        <p>/game</p>
-      </div>
-      <div class="use">
-        <p>Check if game exists for user in likes and shelf</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="type">
-        <p class="delete">DELETE</p>
-      </div>
-      <div class="route">
-        <p>/user</p>
-      </div>
-      <div class="use">
-        <p>Delete a game for the user</p>
-      </div>
-      <div class="requirements">
-        <p>userId, gameId</p>
+      <div class="row">
+        <div class="type">
+          <p class="delete">DELETE</p>
+        </div>
+        <div class="route">
+          <p>/user</p>
+        </div>
+        <div class="use">
+          <p>Delete user and its liked/shelved games</p>
+        </div>
+        <div class="requirements">
+          <p>name, password</p>
+        </div>
       </div>
     </div>
   </div>
+  
+  <div class="part">
+    <p class="routeName">Like routes</p>
+    <div class="block">
+      <div class="row top">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/likes</p>
+        </div>
+        <div class="use">
+          <p>Get all liked games of user</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="post">POST</p>
+        </div>
+        <div class="route">
+          <p>/like</p>
+        </div>
+        <div class="use">
+          <p>Create a new liked game</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="put">PUT</p>
+        </div>
+        <div class="route">
+          <p>/like</p>
+        </div>
+        <div class="use">
+          <p>Change liked status</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="part">
+    <p class="routeName">Shelf routes</p>
+    <div class="block">
+      <div class="row top">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/shelved</p>
+        </div>
+        <div class="use">
+          <p>Get all shelved games of user</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="post">POST</p>
+        </div>
+        <div class="route">
+          <p>/shelf</p>
+        </div>
+        <div class="use">
+          <p>Create a new shelved game</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="put">PUT</p>
+        </div>
+        <div class="route">
+          <p>/shelf</p>
+        </div>
+        <div class="use">
+          <p>Change shelved status</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="part final">
+    <p class="routeName">Like and shelf common routes</p>
+    <div class="block">
+      <div class="row top">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/games</p>
+        </div>
+        <div class="use">
+          <p>Get all likes and shelfs</p>
+        </div>
+        <div class="requirements">
+          <p>none</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="get">GET</p>
+        </div>
+        <div class="route">
+          <p>/game</p>
+        </div>
+        <div class="use">
+          <p>Check if game exists for user in likes and shelf</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="type">
+          <p class="delete">DELETE</p>
+        </div>
+        <div class="route">
+          <p>/user</p>
+        </div>
+        <div class="use">
+          <p>Delete a game for the user</p>
+        </div>
+        <div class="requirements">
+          <p>userId, gameId</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </body>
 </html>
