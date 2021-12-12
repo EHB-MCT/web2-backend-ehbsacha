@@ -65,7 +65,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
-        const query = { userId: req.query.userId, liked: true }; // Query to look for all items liked by this user
+        const query = { userId: req.query.userId, liked: true }; // Query to look for all items liked by the user
         const likedgames = await colli.find(query).toArray(); // Retrieve data filtered by query
 
         // Send back the data
@@ -178,10 +178,6 @@ app.put("/like", async (req, res) => { // Change the liked state of a game for t
 
         // Get data of currrent selected game and if it exists
         const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
-        if(current){ // Checks existance
-            res.status(400).send('Bad request: No boardgame is found to change'); // Error message if there is no object to change
-            return; // Return
-        }
 
         // Change data
         const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
@@ -192,6 +188,39 @@ app.put("/like", async (req, res) => { // Change the liked state of a game for t
         // Send back success message
         res.status(201).send(`Challenge with id "${req.body.gameId}" successfully updated.`); // The succes message
 
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+
+// ------------------ //
+// setup shelf routes //
+// ------------------ //
+
+// /shelves?userId=?
+app.get('/shelved', async (req, res) => { // Get all shelved games of a certain user
+    try{
+        // Database
+        await client.connect(); //connect to the db 
+        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
+
+        // Select the right data
+        const query = { userId: req.query.userId, shelf: true }; // Query to look for all items shelved by the user
+        const shelvedgames = await colli.find(query).toArray(); // Retrieve data filtered by query
+
+        // Send back the data
+        if(shelvedgames){ // if not empty
+            res.status(200).send(shelvedgames); // Send back the data with the response
+            return; // Return
+        }else{
+            res.status(400).send('Boardgame could not be found with id: ' + req.query.userId); // If empty send error
+        }
+      
     }catch(error){ // A error catch
         console.log(error); // Log the error
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
