@@ -53,6 +53,34 @@ app.get('/userData', async (req, res) =>{
     }
 });
 
+// Deleting a likeAndShelf
+app.delete("/delete", async (req, res) => {
+    try {
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
+
+        // Get data of currrent selected game
+        const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
+
+        // delete data
+        const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
+        const result = await colli.deleteOne(query); // Deleting the challenge
+        if (result.deletedCount === 1) { // Check if something got removed
+            res.status(200).send(`Game with id "${req.query.gameId}" successfully deleted.`); // The succes message
+        } else {
+            res.status(404).send("No documents matched the query. Deleted 0 documents."); // The fail message
+        }
+
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
 // ----------------- //
 // setup like routes //
 // ----------------- //
@@ -61,7 +89,7 @@ app.get('/userData', async (req, res) =>{
 app.get('/likes', async (req, res) => { // Get all liked games of a certain user
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
@@ -95,7 +123,7 @@ app.get('/like', async (req, res) => { // Check if a game is put in database bef
 
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
@@ -129,7 +157,7 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
 
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Validation for double boardgames
@@ -173,10 +201,10 @@ app.put("/like", async (req, res) => { // Change the liked state of a game for t
 
     try {
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
-        // Get data of currrent selected game and if it exists
+        // Get data of currrent selected game
         const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
 
         // Change data
@@ -186,7 +214,7 @@ app.put("/like", async (req, res) => { // Change the liked state of a game for t
         await colli.updateOne(query, liked, options);// Updating the challenge
 
         // Send back success message
-        res.status(201).send(`Challenge with id "${req.body.gameId}" successfully updated.`); // The succes message
+        res.status(201).send(`Liked status of game with id "${req.body.gameId}" successfully updated.`); // The succes message
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -206,7 +234,7 @@ app.put("/like", async (req, res) => { // Change the liked state of a game for t
 app.get('/shelved', async (req, res) => { // Get all shelved games of a certain user
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
@@ -240,7 +268,7 @@ app.get('/shelf', async (req, res) => { // Check if a game is put in database be
 
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
@@ -274,7 +302,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
 
     try{
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Validation for double boardgames
@@ -318,7 +346,7 @@ app.put("/shelf", async (req, res) => { // Change the shelved state of a game fo
 
     try {
         // Database
-        await client.connect(); //connect to the db 
+        await client.connect(); // Connect to the db 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Get data of currrent selected game and if it exists
@@ -331,7 +359,7 @@ app.put("/shelf", async (req, res) => { // Change the shelved state of a game fo
         await colli.updateOne(query, liked, options);// Updating the challenge
 
         // Send back success message
-        res.status(201).send(`Challenge with id "${req.body.gameId}" successfully updated.`); // The succes message
+        res.status(201).send(`shelved status of game with id "${req.body.gameId}" successfully updated.`); // The succes message
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
