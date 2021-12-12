@@ -8,6 +8,7 @@ const bodyParser = require('body-parser'); // require body-parser
 const { MongoClient } = require('mongodb'); // require mongodb
 const ObjectId = require("mongodb").ObjectId; // require mogodb subcategory to read mongo special ObjectIds
 const cors = require("cors"); // require cors so the frontend won't have problems with this policy
+const passwordHash = require('password-hash'); // require password-hash to hash passwords
 
 require('dotenv').config(); // via dotenv I can create the env file (not published btw) which I use for credentials and url
 
@@ -420,7 +421,7 @@ app.post('/user', async (req, res) => { // Save user if not already in users
         // Create the new user object
         let newUser = {
             name: req.body.name, // Using name
-            password: req.body.password, // Using password
+            password: passwordHash.generate(req.body.password), // Using password
             email: req.body.email // Using email
         }
 
@@ -431,6 +432,49 @@ app.post('/user', async (req, res) => { // Save user if not already in users
         res.status(201).send(`User succesfully saved with name ${req.body.name}`); // The succes message
         return; // Return
 
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// GET /user
+app.get('/user', async (req, res) => { // Check if a game is put in database before
+    // Validation
+    if(!req.body.name || !req.body.password){ // Checks if the required name and password are send
+        res.status(400).send('Bad request: Missing name, password'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try{
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // Get data of currrent selected game and if it exists
+        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of game
+
+        var checkHash = passwordHash.verify(req.body.password, compare.password);
+        if(checkHash == true){
+            // Select the user data of this profile
+            const query = { name: req.body.name}; // Query to look if game is put in database before
+            const correct = await colli.find(query).toArray(); // Retrieve data filtered by query
+
+            // Send back the data
+            if(correct){ // if not empty
+                res.status(200).send(correct); // Send back the data with the response
+                return; // Return
+            }else{
+                res.status(400).send('User could not be found with name: ' + req.body.name); // If empty send error
+            }
+        }else{
+            res.status(400).send("Password doesn't match user with username " + req.body.name); // If empty send error
+        }
+        
+      
     }catch(error){ // A error catch
         console.log(error); // Log the error
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
