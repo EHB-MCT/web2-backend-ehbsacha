@@ -9,10 +9,35 @@
 </head>
 <body>
   <h1>API documentation</h1>
+  <h2>Root route</h2>
   <ul>
-    <li>GET / = root info page</li>
-    <li>GET /test = a test string</li>
-    <li>GET /data = a random JSON object</li>
+    <li>/ = root info page</li>
+  </ul>
+  <h2>User routes</h2>
+  <ul>
+    <li>GET /users = get all users</li>
+    <li>GET /user = login by sending required: name, password</li>
+    <li>POST /user = Create a new user required: name, password, email</li>
+    <li>PUT /user/name = Change userName required: name, password, newName</li>
+    <li>PUT /user/password = Change password required: name, password, newPassword</li>
+    <li>DELETE /user = Delete a user and all liked and shelved games required: name, password</li>
+  </ul>
+  <h2>Like routes</h2>
+  <ul>
+    <li>GET /likes = Get all liked games of user required: userId, gameId</li>
+    <li>POST /like = Create a new liked game required: userId, gameId</li>
+    <li>PUT /like = Change liked status required: userId, gameId</li>
+  </ul>
+  <h2>Shelf routes</h2>
+  <ul>
+    <li>GET /shelved = Get all shelved games of user required: userId, gameId</li>
+    <li>POST /shelf = Create a new shelved game required: userId, gameId</li>
+    <li>PUT /shelf = Change shelved status required: userId, gameId</li>
+  </ul>
+  <h2>Like and shelf common routes</h2>
+  <ul>
+    <li>GET /game = Check if game exists for user in likes and shelf</li>
+    <li>DELETE /game = Delete a game for user</li>
   </ul>
 </body>
 </html>

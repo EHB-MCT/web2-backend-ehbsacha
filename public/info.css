@@ -11,6 +11,10 @@ h1 {
   color: white;
 }
 
+h2{
+  margin: 25px 30px;
+}
+
 li {
   margin: 40px 100px;
 }
