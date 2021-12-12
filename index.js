@@ -53,7 +53,7 @@ app.get('/allLikesAndShelfs', async (req, res) =>{
 });
 
 // Deleting a likeAndShelf
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", async (req, res) => { // Delete a likesAndShelf item
     try {
         // Database
         await client.connect(); // Connect to the db 
@@ -312,7 +312,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
         } 
 
         // Create the new boardgame object
-        let likeBoardgame = {
+        let shelfBoardgame = {
             userId: req.body.userId, // Using userId
             gameId: req.body.gameId, // Using gameId
             liked: false, // we create for the shelf at the moment so liked keeps on false
@@ -320,7 +320,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
         }
 
         // Insert into the database
-        await colli.insertOne(likeBoardgame);
+        await colli.insertOne(shelfBoardgame);
 
         // Send back successmessage
         res.status(201).send(`Boardgame succesfully saved with id ${req.body.gameId}`); // The succes message
@@ -387,6 +387,49 @@ app.get('/allUsers', async (req, res) =>{
 
         // Send back the data
         res.status(200).send(alldata); // Send back the data with the response
+
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// POST /like
+app.post('/user', async (req, res) => { // Save user if not already in users 
+    // Validation
+    if(!req.body.name || !req.body.password || !req.body.email){ // Checks if the required name, password and email are send
+        res.status(400).send('Bad request: Missing name, password, email'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try{
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // Validation for double usernames
+        const exist = await colli.findOne({ name: req.body.name}); // Find if username already exists
+        if(exist){ // Checks existance
+            res.status(400).send('Bad request: The name > ' + req.body.name + " < is already taken"); // Error message if username is already taken
+            return; // Return
+        } 
+
+        // Create the new user object
+        let newUser = {
+            name: req.body.name, // Using name
+            password: req.body.password, // Using password
+            email: req.body.email // Using email
+        }
+
+        // Insert into the database
+        await colli.insertOne(newUser);
+
+        // Send back successmessage
+        res.status(201).send(`User succesfully saved with name ${req.body.name}`); // The succes message
+        return; // Return
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
