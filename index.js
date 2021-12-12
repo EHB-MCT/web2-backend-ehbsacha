@@ -37,7 +37,7 @@ app.get('/', (req, res) => { // If you don't type a route the root will redirect
 // Setup user routes //
 // ----------------- //
 
-// limited time only, you shouldn't be able to get all users data this easy
+// For develop use only
 // /users
 app.get('/users', async (req, res) =>{
     try{
@@ -498,7 +498,7 @@ app.put('/shelf', async (req, res) => { // Change the shelved state of a game fo
 // likes and shelf common routes //
 // ----------------------------- //
 
-// limited time only, you shouldn't be able to get all peoples liked games this easy
+// For develop use only
 // GET /games
 app.get('/games', async (req, res) =>{ // Select all liked or shelved games
     try{

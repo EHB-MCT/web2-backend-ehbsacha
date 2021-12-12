@@ -7,3 +7,5 @@ Compare my code with code from a previous group project: https://github.com/EHB-
 I used the documentation on the mongodb site: https://docs.mongodb.com/
 
 For hashing passwords: https://www.npmjs.com/package/password-hash
+
+Memory freshup flexboxes: https://www.w3schools.com/csS/css3_flexbox.asp

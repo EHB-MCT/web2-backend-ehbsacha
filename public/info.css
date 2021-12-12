@@ -65,6 +65,15 @@ nav a {
   flex-direction: column;
 }
 
+.rowexplain {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  font-size: 18px;
+  color: rgb(109, 109, 109);
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -78,15 +87,16 @@ nav a {
   border-top: 1px solid gray;
 }
 
-/* flexbox first child */
+.typeexplain {
+  padding: 20px 0;
+  padding-left: 15px;
+  width: 15%;
+}
 
 .type {
   padding: 20px 0;
   padding-left: 15px;
   font-size: 25px;
-}
-
-.type {
   width: 15%;
 }
 
