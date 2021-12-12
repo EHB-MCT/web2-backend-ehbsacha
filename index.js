@@ -1,3 +1,5 @@
+'use strict'
+
 // ------------------------------------------- //
 // getting required files                      //
 // setup of the required files and the project //
@@ -30,13 +32,18 @@ app.get('/', (req, res) => { // If you don't type a route the root will redirect
     res.status(300).redirect('/info.html'); // The redirection route
 });
 
-// limited time only, you shouldn't be able to get all peoples liked games this easy
-// Return all likes and shelfs
-app.get('/allLikesAndShelfs', async (req, res) =>{
+
+// ----------------- //
+// Setup user routes //
+// ----------------- //
+
+// limited time only, you shouldn't be able to get all users data this easy
+// /users
+app.get('/users', async (req, res) =>{
     try{
         // Database
         await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
 
         // Select the right data
         const alldata = await colli.find({}).toArray(); // Retrieve all data no query
@@ -53,23 +60,204 @@ app.get('/allLikesAndShelfs', async (req, res) =>{
     }
 });
 
-// Deleting a likeAndShelf
-app.delete('/delete', async (req, res) => { // Delete a likesAndShelf item
+// GET /user
+app.get('/user', async (req, res) => { // Login with database credentials
+    // Validation
+    if(!req.body.name || !req.body.password){ // Checks if the required name and password are send
+        res.status(400).send('Bad request: Missing name, password'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try{
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // Get data of selected name
+        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile for hashCheck
+        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
+        if(checkHash == true){
+            // Select the user data of this profile
+            const query = { name: req.body.name}; // Query to look if game is put in database before
+            const correct = await colli.find(query).toArray(); // Retrieve data filtered by query
+
+            // Send back the data
+            if(correct){ // if not empty
+                res.status(200).send(correct); // Send back the data with the response
+                return; // Return
+            }else{
+                res.status(400).send('User could not be found with name: ' + req.body.name); // If empty send error
+            }
+        }else{
+            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+        }
+        
+      
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// POST /user
+app.post('/user', async (req, res) => { // Save user if not already in users 
+    // Validation
+    if(!req.body.name || !req.body.password || !req.body.email){ // Checks if the required name, password and email are send
+        res.status(400).send('Bad request: Missing name, password, email'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try{
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // Validation for double usernames
+        const exist = await colli.findOne({ name: req.body.name}); // Find if username already exists
+        if(exist){ // Checks existance
+            res.status(400).send(`Bad request: The name > ${req.body.name} < is already taken`); // Error message if username is already taken
+            return; // Return
+        } 
+
+        // Create the new user object
+        let newUser = {
+            name: req.body.name, // Using name
+            password: passwordHash.generate(req.body.password), // Using password
+            email: req.body.email // Using email
+        }
+
+        // Insert into the database
+        await colli.insertOne(newUser);
+
+        // Send back successmessage
+        res.status(201).send(`User succesfully saved with name ${req.body.name}`); // The succes message
+        return; // Return
+
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// PUT /user/name
+app.put('/user/name', async (req, res) => { // Change the name of a user
+    // Validation
+    if(!req.body.name || !req.body.password || !req.body.newName){ // Checks if the required name, password and newName are send
+        res.status(400).send('Bad request: Missing name, password, newName'); // Sends back error if they are not send
+        return; // return
+    }
+
     try {
         // Database
         await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
 
-        // Get data of currrent selected game
-        const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
+        // Validation for double usernames
+        const exist = await colli.findOne({ name: req.body.newName}); // Find if username already exists
+        if(exist){ // Checks existance
+            res.status(400).send('Bad request: The name > ' + req.body.newName + ' < is already taken'); // Error message if username is already taken
+            return; // Return
+        }
 
-        // delete data
-        const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
-        const result = await colli.deleteOne(query); // Deleting the challenge
-        if (result.deletedCount === 1) { // Check if something got removed
-            res.status(200).send(`Game with id ${req.body.gameId} successfully deleted.`); // The succes message
-        } else {
-            res.status(404).send(`No documents matched the query. Deleted 0 documents.`); // The fail message
+        // redo a login before being able to edit a profile
+        // Get data of selected name
+        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
+        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
+        if(checkHash == true){ // If hash comes out succesfully change password
+            // Change data
+            const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
+            const changeName = { $set: {name: req.body.newName} }; // Only change the name of the object
+            const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
+            await colli.updateOne(query, changeName, options);// Updating the challenge
+            
+            // Send back success message
+            res.status(201).send(`Username has succesfully updated from ${req.body.name} to ${req.body.newName}`); // The succes message
+        }else{
+            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+        }
+
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// PUT /user/password
+app.put('/user/password', async (req, res) => { // Change the password of a user
+    // Validation
+    if(!req.body.name || !req.body.password || !req.body.newPassword){ // Checks if the required name, password and newPassword are send
+        res.status(400).send('Bad request: Missing name, password, newPassword'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try {
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // redo a login before being able to edit a profile
+        // Get data of selected name
+        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
+        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
+        if(checkHash == true){ // If hash comes out succesfully change password
+            // Change data
+            const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
+            const changeName = { $set: {password: passwordHash.generate(req.body.newPassword)} }; // Only change the name of the object
+            const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
+            await colli.updateOne(query, changeName, options);// Updating the challenge
+            
+            // Send back success message
+            res.status(201).send(`Password has succesfully been updated`); // The succes message
+        }else{
+            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+        }
+
+    }catch(error){ // A error catch
+        console.log(error); // Log the error
+        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
+
+    }finally { // At the end
+        await client.close(); // close the database connection
+    }
+});
+
+// DELETE /user
+app.delete('/user', async (req, res) => { // Change the password of a user
+    // Validation
+    if(!req.body.name || !req.body.password){ // Checks if the required name, password and newPassword are send
+        res.status(400).send('Bad request: Missing name, password'); // Sends back error if they are not send
+        return; // return
+    }
+
+    try {
+        // Database
+        await client.connect(); // Connect to the db 
+        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+
+        // redo a login before being able to delete a profile
+        // Get data of selected name
+        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
+        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
+        if(checkHash == true){ // If hash comes out succesfully change password
+            // delete data
+            const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
+            const result = await colli.deleteOne(query); // Deleting the challenge
+            if (result.deletedCount === 1) { // Check if something got removed
+                res.status(200).send(`user with name ${req.body.name} successfully deleted.`); // The succes message
+            } else {
+                res.status(404).send(`No documents matched the query. Deleted 0 documents.`); // The fail message
+            }
+        }else{
+            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
         }
 
     }catch(error){ // A error catch
@@ -99,40 +287,6 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
         // Send back the data
         if(likedgames){ // if not empty
             res.status(200).send(likedgames); // Send back the data with the response
-            return; // Return
-        }else{
-            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
-        }
-      
-    }catch(error){ // A error catch
-        console.log(error); // Log the error
-        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
-
-    }finally { // At the end
-        await client.close(); // close the database connection
-    }
-});
-
-// GET /like
-app.get('/like', async (req, res) => { // Check if a game is put in database before
-    // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
-        res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
-        return; // return
-    }
-
-    try{
-        // Database
-        await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
-
-        // Select the right data
-        const query = { userId: req.body.userId, gameId: req.body.gameId }; // Query to look if game is put in database before
-        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
-
-        // Send back the data
-        if(exist){ // if not empty
-            res.status(200).send(exist); // Send back the data with the response
             return; // Return
         }else{
             res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
@@ -258,40 +412,6 @@ app.get('/shelved', async (req, res) => { // Get all shelved games of a certain 
     }
 });
 
-// GET /shelf
-app.get('/shelf', async (req, res) => { // Check if a game is put in database before
-    // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
-        res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
-        return; // return
-    }
-
-    try{
-        // Database
-        await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
-
-        // Select the right data
-        const query = { userId: req.body.userId, gameId: req.body.gameId }; // Query to look if game is put in database before
-        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
-
-        // Send back the data
-        if(exist){ // if not empty
-            res.status(200).send(exist); // Send back the data with the response
-            return; // Return
-        }else{
-            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
-        }
-      
-    }catch(error){ // A error catch
-        console.log(error); // Log the error
-        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
-
-    }finally { // At the end
-        await client.close(); // close the database connection
-    }
-});
-
 // POST /shelf
 app.post('/shelf', async (req, res) => { // Save a boardgame if not already in likesAndSaves 
     // Validation
@@ -371,17 +491,17 @@ app.put('/shelf', async (req, res) => { // Change the shelved state of a game fo
 });
 
 
-// ----------------- //
-// Setup user routes //
-// ----------------- //
+// ----------------------------- //
+// likes and shelf common routes //
+// ----------------------------- //
 
-// limited time only, you shouldn't be able to get all users data this easy
-// /allUsers
-app.get('/allUsers', async (req, res) =>{
+// limited time only, you shouldn't be able to get all peoples liked games this easy
+// GET /games
+app.get('/games', async (req, res) =>{ // Select all liked or shelved games
     try{
         // Database
         await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
         const alldata = await colli.find({}).toArray(); // Retrieve all data no query
@@ -398,81 +518,30 @@ app.get('/allUsers', async (req, res) =>{
     }
 });
 
-// POST /user
-app.post('/user', async (req, res) => { // Save user if not already in users 
+// GET /game 
+app.get('/game', async (req, res) => { // Check if a game is put in database before
     // Validation
-    if(!req.body.name || !req.body.password || !req.body.email){ // Checks if the required name, password and email are send
-        res.status(400).send('Bad request: Missing name, password, email'); // Sends back error if they are not send
+    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+        res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
 
     try{
         // Database
         await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
-        // Validation for double usernames
-        const exist = await colli.findOne({ name: req.body.name}); // Find if username already exists
-        if(exist){ // Checks existance
-            res.status(400).send(`Bad request: The name > ${req.body.name} < is already taken`); // Error message if username is already taken
+        // Select the right data
+        const query = { userId: req.body.userId, gameId: req.body.gameId }; // Query to look if game is put in database before
+        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
+
+        // Send back the data
+        if(exist){ // if not empty
+            res.status(200).send(exist); // Send back the data with the response
             return; // Return
-        } 
-
-        // Create the new user object
-        let newUser = {
-            name: req.body.name, // Using name
-            password: passwordHash.generate(req.body.password), // Using password
-            email: req.body.email // Using email
-        }
-
-        // Insert into the database
-        await colli.insertOne(newUser);
-
-        // Send back successmessage
-        res.status(201).send(`User succesfully saved with name ${req.body.name}`); // The succes message
-        return; // Return
-
-    }catch(error){ // A error catch
-        console.log(error); // Log the error
-        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
-
-    }finally { // At the end
-        await client.close(); // close the database connection
-    }
-});
-
-// GET /user
-app.get('/user', async (req, res) => { // Check if a game is put in database before
-    // Validation
-    if(!req.body.name || !req.body.password){ // Checks if the required name and password are send
-        res.status(400).send('Bad request: Missing name, password'); // Sends back error if they are not send
-        return; // return
-    }
-
-    try{
-        // Database
-        await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
-
-        // Get data of selected name
-        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile for hashCheck
-        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
-        if(checkHash == true){
-            // Select the user data of this profile
-            const query = { name: req.body.name}; // Query to look if game is put in database before
-            const correct = await colli.find(query).toArray(); // Retrieve data filtered by query
-
-            // Send back the data
-            if(correct){ // if not empty
-                res.status(200).send(correct); // Send back the data with the response
-                return; // Return
-            }else{
-                res.status(400).send('User could not be found with name: ' + req.body.name); // If empty send error
-            }
         }else{
-            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
         }
-        
       
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -483,41 +552,23 @@ app.get('/user', async (req, res) => { // Check if a game is put in database bef
     }
 });
 
-// PUT /user/name
-app.put('/user/name', async (req, res) => { // Change the name of a user
-    // Validation
-    if(!req.body.name || !req.body.password || !req.body.newName){ // Checks if the required name, password and newName are send
-        res.status(400).send('Bad request: Missing name, password, newName'); // Sends back error if they are not send
-        return; // return
-    }
-
+// DELETE /game
+app.delete('/game', async (req, res) => { // Delete a likesAndShelf item
     try {
         // Database
         await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
+        const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
-        // Validation for double usernames
-        const exist = await colli.findOne({ name: req.body.newName}); // Find if username already exists
-        if(exist){ // Checks existance
-            res.status(400).send('Bad request: The name > ' + req.body.newName + ' < is already taken'); // Error message if username is already taken
-            return; // Return
-        }
+        // Get data of currrent selected game
+        const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
 
-        // redo a login before being able to edit a profile
-        // Get data of selected name
-        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
-        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
-        if(checkHash == true){ // If hash comes out succesfully change password
-            // Change data
-            const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
-            const changeName = { $set: {name: req.body.newName} }; // Only change the name of the object
-            const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
-            await colli.updateOne(query, changeName, options);// Updating the challenge
-            
-            // Send back success message
-            res.status(201).send(`Username has succesfully updated from ${req.body.name} to ${req.body.newName}`); // The succes message
-        }else{
-            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+        // delete data
+        const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
+        const result = await colli.deleteOne(query); // Deleting the challenge
+        if (result.deletedCount === 1) { // Check if something got removed
+            res.status(200).send(`Game with id ${req.body.gameId} successfully deleted.`); // The succes message
+        } else {
+            res.status(404).send(`No documents matched the query. Deleted 0 documents.`); // The fail message
         }
 
     }catch(error){ // A error catch
@@ -529,44 +580,6 @@ app.put('/user/name', async (req, res) => { // Change the name of a user
     }
 });
 
-// PUT /user/password
-app.put('/user/password', async (req, res) => { // Change the name of a user
-    // Validation
-    if(!req.body.name || !req.body.password || !req.body.newPassword){ // Checks if the required name, password and newPassword are send
-        res.status(400).send('Bad request: Missing name, password, newPassword'); // Sends back error if they are not send
-        return; // return
-    }
-
-    try {
-        // Database
-        await client.connect(); // Connect to the db 
-        const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
-
-        // redo a login before being able to edit a profile
-        // Get data of selected name
-        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
-        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
-        if(checkHash == true){ // If hash comes out succesfully change password
-            // Change data
-            const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
-            const changeName = { $set: {password: passwordHash.generate(req.body.newPassword)} }; // Only change the name of the object
-            const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
-            await colli.updateOne(query, changeName, options);// Updating the challenge
-            
-            // Send back success message
-            res.status(201).send(`Password has succesfully been updated`); // The succes message
-        }else{
-            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
-        }
-
-    }catch(error){ // A error catch
-        console.log(error); // Log the error
-        res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
-
-    }finally { // At the end
-        await client.close(); // close the database connection
-    }
-});
 
 // -------------- //
 // Listen to port //
