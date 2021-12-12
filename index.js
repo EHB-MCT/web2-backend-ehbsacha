@@ -252,7 +252,10 @@ app.delete('/user', async (req, res) => { // Change the password of a user
             const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
             const result = await colli.deleteOne(query); // Deleting the challenge
             if (result.deletedCount === 1) { // Check if something got removed
-                res.status(200).send(`user with name ${req.body.name} successfully deleted.`); // The succes message
+                const connect = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
+                const deleteUserdata = { userId: String(compare._id) }; // all the data that needs to be deleted
+                await connect.deleteMany(deleteUserdata); // Deleting the challenge
+                res.status(200).send(`user with name ${req.body.name} successfully deleted and the userdata along.`); // The succes message
             } else {
                 res.status(404).send(`No documents matched the query. Deleted 0 documents.`); // The fail message
             }
