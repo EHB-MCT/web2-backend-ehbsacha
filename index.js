@@ -63,7 +63,7 @@ app.get('/users', async (req, res) =>{
 // GET /user
 app.get('/user', async (req, res) => { // Login with database credentials
     // Validation
-    if(!req.body.name || !req.body.password){ // Checks if the required name and password are send
+    if(!req.query.name || !req.query.password){ // Checks if the required name and password are send
         res.status(400).send('Bad request: Missing name, password'); // Sends back error if they are not send
         return; // return
     }
@@ -74,11 +74,11 @@ app.get('/user', async (req, res) => { // Login with database credentials
         const colli = client.db('gameheaven').collection('users'); // Create connection route / Select collection
 
         // Get data of selected name
-        const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile for hashCheck
-        var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
+        const compare = Object(await colli.findOne({ name: req.query.name})); // Find current status of profile for hashCheck
+        var checkHash = passwordHash.verify(req.query.password, compare.password); // Do the hashCheck
         if(checkHash == true){
             // Select the user data of this profile
-            const query = { name: req.body.name}; // Query to look if game is put in database before
+            const query = { name: req.query.name}; // Query to look if game is put in database before
             const correct = await colli.find(query).toArray(); // Retrieve data filtered by query
 
             // Send back the data
@@ -86,10 +86,10 @@ app.get('/user', async (req, res) => { // Login with database credentials
                 res.status(200).send(correct); // Send back the data with the response
                 return; // Return
             }else{
-                res.status(400).send('User could not be found with name: ' + req.body.name); // If empty send error
+                res.status(400).send('User could not be found with name: ' + req.query.name); // If empty send error
             }
         }else{
-            res.status(400).send(`Password doesn't match user with username ${req.body.name}`); // If empty send error
+            res.status(400).send(`Password doesn't match user with username ${req.query.name}`); // If empty send error
         }
         
       
@@ -284,7 +284,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
-        const query = { userId: req.body.userId, liked: true }; // Query to look for all items liked by the user
+        const query = { userId: req.query.userId, liked: true }; // Query to look for all items liked by the user
         const likedgames = await colli.find(query).toArray(); // Retrieve data filtered by query
 
         // Send back the data
@@ -292,7 +292,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
             res.status(200).send(likedgames); // Send back the data with the response
             return; // Return
         }else{
-            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
+            res.status(400).send('Boardgame could not be found with id: ' + req.query.userId); // If empty send error
         }
       
     }catch(error){ // A error catch
@@ -307,7 +307,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
 // POST /like
 app.post('/like', async (req, res) => { // Save a boardgame if not already in likesAndSaves 
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -395,7 +395,7 @@ app.get('/shelved', async (req, res) => { // Get all shelved games of a certain 
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
-        const query = { userId: req.body.userId, shelf: true }; // Query to look for all items shelved by the user
+        const query = { userId: req.query.userId, shelf: true }; // Query to look for all items shelved by the user
         const shelvedgames = await colli.find(query).toArray(); // Retrieve data filtered by query
 
         // Send back the data
@@ -403,7 +403,7 @@ app.get('/shelved', async (req, res) => { // Get all shelved games of a certain 
             res.status(200).send(shelvedgames); // Send back the data with the response
             return; // Return
         }else{
-            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
+            res.status(400).send('Boardgame could not be found with id: ' + req.query.userId); // If empty send error
         }
       
     }catch(error){ // A error catch
@@ -524,7 +524,7 @@ app.get('/games', async (req, res) =>{ // Select all liked or shelved games
 // GET /game 
 app.get('/game', async (req, res) => { // Check if a game is put in database before
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -535,7 +535,7 @@ app.get('/game', async (req, res) => { // Check if a game is put in database bef
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Select the right data
-        const query = { userId: req.body.userId, gameId: req.body.gameId }; // Query to look if game is put in database before
+        const query = { userId: req.query.userId, gameId: req.query.gameId }; // Query to look if game is put in database before
         const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
 
         // Send back the data
@@ -543,7 +543,7 @@ app.get('/game', async (req, res) => { // Check if a game is put in database bef
             res.status(200).send(exist); // Send back the data with the response
             return; // Return
         }else{
-            res.status(400).send('Boardgame could not be found with id: ' + req.body.userId); // If empty send error
+            res.status(400).send('Boardgame could not be found with id: ' + req.query.userId); // If empty send error
         }
       
     }catch(error){ // A error catch
