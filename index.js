@@ -120,21 +120,21 @@ app.post('/user', async (req, res) => { // Save user if not already in users
         if(exist){ // Checks existance
             res.status(400).send(`Bad request: The name > ${req.body.name} < is already taken`); // Error message if username is already taken
             return; // Return
-        } 
+        };
 
         // Create the new user object
         let newUser = {
             name: req.body.name, // Using name
             password: passwordHash.generate(req.body.password), // Using password
             email: req.body.email // Using email
-        }
+        };
 
         // Insert into the database
         await colli.insertOne(newUser);
 
-        // Send back successmessage
-        res.status(201).send(`User succesfully saved with name ${req.body.name}`); // The succes message
-        return; // Return
+        // Send back successdata
+        const correct = await colli.find({name: req.body.name}).toArray(); // Retrieve data filtered by query
+        res.status(200).send(correct); // Send back the data of the newly created user
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -307,7 +307,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
 // POST /like
 app.post('/like', async (req, res) => { // Save a boardgame if not already in likesAndSaves 
     // Validation
-    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
+    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -322,7 +322,7 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
         if(exist){ // Checks existance
             res.status(400).send('Bad request: boardgame already exists with gameId ' + req.body.gameId); // Error message if the game already exists for user
             return; // Return
-        } 
+        };
 
         // Create the new boardgame object
         let likeBoardgame = {
@@ -330,14 +330,15 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
             gameId: req.body.gameId, // Using gameId
             liked: true, // Set state to liked
             shelf: false // we create for the like at the moment so shelf keeps on false
-        }
+        };
 
         // Insert into the database
         await colli.insertOne(likeBoardgame);
 
-        // Send back successmessage
-        res.status(201).send(`Boardgame succesfully saved with id ${req.body.gameId}`); // The succes message
-        return; // Return
+        // Send back successdata
+        const query = { userId: req.query.userId, gameId: req.query.gameId }; // Query to look for the game
+        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
+        res.status(200).send(exist); // Send back the data with the response
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -433,7 +434,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
         if(exist){ // Checks existance
             res.status(400).send('Bad request: boardgame already exists with gameId ' + req.body.gameId); // Error message if the game already exists for user
             return; // Return
-        } 
+        };
 
         // Create the new boardgame object
         let shelfBoardgame = {
@@ -441,14 +442,15 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
             gameId: req.body.gameId, // Using gameId
             liked: false, // we create for the shelf at the moment so liked keeps on false
             shelf: true // Set state to liked
-        }
+        };
 
         // Insert into the database
         await colli.insertOne(shelfBoardgame);
 
-        // Send back successmessage
-        res.status(201).send(`Boardgame succesfully saved with id ${req.body.gameId}`); // The succes message
-        return; // Return
+        // Send back successdata
+        const query = { userId: req.query.userId, gameId: req.query.gameId }; // Query to look for the game
+        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
+        res.status(200).send(exist); // Send back the data with the response
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
