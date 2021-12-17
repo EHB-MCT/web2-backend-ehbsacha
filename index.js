@@ -337,8 +337,8 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
 
         // Send back successdata
         const query = { userId: req.query.userId, gameId: req.query.gameId }; // Query to look for the game
-        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
-        res.status(200).send(exist); // Send back the data with the response
+        const game = await colli.find(query).toArray(); // Retrieve data filtered by query
+        res.status(200).send(game); // Send back the data with the response
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -449,8 +449,8 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
 
         // Send back successdata
         const query = { userId: req.query.userId, gameId: req.query.gameId }; // Query to look for the game
-        const exist = await colli.find(query).toArray(); // Retrieve data filtered by query
-        res.status(200).send(exist); // Send back the data with the response
+        const game = await colli.find(query).toArray(); // Retrieve data filtered by query
+        res.status(200).send(game); // Send back the data with the response
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
