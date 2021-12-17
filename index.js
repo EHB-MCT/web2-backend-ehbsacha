@@ -148,7 +148,7 @@ app.post('/user', async (req, res) => { // Save user if not already in users
 // PUT /user/name
 app.put('/user/name', async (req, res) => { // Change the name of a user
     // Validation
-    if(!req.body.name || !req.body.password || !req.body.newName){ // Checks if the required name, password and newName are send
+    if(!req.body.name || !req.body.password || !req.body.newName || !req.body._id){ // Checks if the required name, password and newName are send
         res.status(400).send('Bad request: Missing name, password, newName'); // Sends back error if they are not send
         return; // return
     }
@@ -169,12 +169,12 @@ app.put('/user/name', async (req, res) => { // Change the name of a user
         // Get data of selected name
         const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
         var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
-        if(checkHash == true){ // If hash comes out succesfully change password
+        if(checkHash == true && compare._id == req.body._id){ // If hash comes out succesfully change password
             // Change data
             const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
             const changeName = { $set: {name: req.body.newName} }; // Only change the name of the object
             const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
-            await colli.updateOne(query, changeName, options);// Updating the challenge
+            await colli.updateOne(query, changeName, options); // Updating the challenge
             
             // Send back success message
             res.status(201).send(`Username has succesfully updated from ${req.body.name} to ${req.body.newName}`); // The succes message
@@ -194,7 +194,8 @@ app.put('/user/name', async (req, res) => { // Change the name of a user
 // PUT /user/password
 app.put('/user/password', async (req, res) => { // Change the password of a user
     // Validation
-    if(!req.body.name || !req.body.password || !req.body.newPassword){ // Checks if the required name, password and newPassword are send
+    console.log(req.body.name, req.body.password, req.body.newPassword);
+    if(!req.body.name || !req.body.password || !req.body.newPassword || !req.body._id){ // Checks if the required name, password and newPassword are send
         res.status(400).send('Bad request: Missing name, password, newPassword'); // Sends back error if they are not send
         return; // return
     }
@@ -208,12 +209,12 @@ app.put('/user/password', async (req, res) => { // Change the password of a user
         // Get data of selected name
         const compare = Object(await colli.findOne({ name: req.body.name})); // Find current status of profile
         var checkHash = passwordHash.verify(req.body.password, compare.password); // Do the hashCheck
-        if(checkHash == true){ // If hash comes out succesfully change password
+        if(checkHash == true && compare._id == req.body._id){ // If hash comes out succesfully change password
             // Change data
             const query = { _id: ObjectId(compare._id) }; // Id of the object that needs to be changed
             const changeName = { $set: {password: passwordHash.generate(req.body.newPassword)} }; // Only change the name of the object
             const options = { upsert: false }; // If it doesn't exist don't create it, it will only have a name
-            await colli.updateOne(query, changeName, options);// Updating the challenge
+            await colli.updateOne(query, changeName, options); // Updating the challenge
             
             // Send back success message
             res.status(201).send(`Password has succesfully been updated`); // The succes message
