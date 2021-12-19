@@ -308,7 +308,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
 // POST /like
 app.post('/like', async (req, res) => { // Save a boardgame if not already in likesAndSaves 
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -319,16 +319,16 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Validation for double boardgames
-        const exist = await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId }); // Find if game exists
+        const exist = await colli.findOne({ userId: req.query.userId, gameId: req.query.gameId }); // Find if game exists
         if(exist){ // Checks existance
-            res.status(400).send('Bad request: boardgame already exists with gameId ' + req.body.gameId); // Error message if the game already exists for user
+            res.status(400).send('Bad request: boardgame already exists with gameId ' + req.query.gameId); // Error message if the game already exists for user
             return; // Return
         };
 
         // Create the new boardgame object
         let likeBoardgame = {
-            userId: req.body.userId, // Using userId
-            gameId: req.body.gameId, // Using gameId
+            userId: req.query.userId, // Using userId
+            gameId: req.query.gameId, // Using gameId
             liked: true, // Set state to liked
             shelf: false // we create for the like at the moment so shelf keeps on false
         };
@@ -353,7 +353,7 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
 // PUT /like
 app.put('/like', async (req, res) => { // Change the liked state of a game for the user
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -364,7 +364,7 @@ app.put('/like', async (req, res) => { // Change the liked state of a game for t
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Get data of currrent selected game
-        const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
+        const current = Object(await colli.findOne({ userId: req.query.userId, gameId: req.query.gameId })); // Find current status of game
 
         // Change data
         const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
@@ -373,7 +373,7 @@ app.put('/like', async (req, res) => { // Change the liked state of a game for t
         await colli.updateOne(query, liked, options);// Updating the challenge
 
         // Send back success message
-        res.status(201).send(`Liked status of game with id ${req.body.gameId} successfully updated.`); // The succes message
+        res.status(201).send(`Liked status of game with id ${req.query.gameId} successfully updated.`); // The succes message
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
@@ -420,7 +420,7 @@ app.get('/shelved', async (req, res) => { // Get all shelved games of a certain 
 // POST /shelf
 app.post('/shelf', async (req, res) => { // Save a boardgame if not already in likesAndSaves 
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -431,16 +431,16 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Validation for double boardgames
-        const exist = await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId }); // Find if game exists
+        const exist = await colli.findOne({ userId: req.query.userId, gameId: req.query.gameId }); // Find if game exists
         if(exist){ // Checks existance
-            res.status(400).send('Bad request: boardgame already exists with gameId ' + req.body.gameId); // Error message if the game already exists for user
+            res.status(400).send('Bad request: boardgame already exists with gameId ' + req.query.gameId); // Error message if the game already exists for user
             return; // Return
         };
 
         // Create the new boardgame object
         let shelfBoardgame = {
-            userId: req.body.userId, // Using userId
-            gameId: req.body.gameId, // Using gameId
+            userId: req.query.userId, // Using userId
+            gameId: req.query.gameId, // Using gameId
             liked: false, // we create for the shelf at the moment so liked keeps on false
             shelf: true // Set state to liked
         };
@@ -465,7 +465,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
 // PUT /shelf
 app.put('/shelf', async (req, res) => { // Change the shelved state of a game for the user
     // Validation
-    if(!req.body.userId || !req.body.gameId){ // Checks if the required userId and gameId are send
+    if(!req.query.userId || !req.query.gameId){ // Checks if the required userId and gameId are send
         res.status(400).send('Bad request: Missing userId, gameId'); // Sends back error if they are not send
         return; // return
     }
@@ -476,7 +476,7 @@ app.put('/shelf', async (req, res) => { // Change the shelved state of a game fo
         const colli = client.db('gameheaven').collection('likesAndShelf'); // Create connection route / Select collection
 
         // Get data of currrent selected game and if it exists
-        const current = Object(await colli.findOne({ userId: req.body.userId, gameId: req.body.gameId })); // Find current status of game
+        const current = Object(await colli.findOne({ userId: req.query.userId, gameId: req.query.gameId })); // Find current status of game
 
         // Change data
         const query = { _id: ObjectId(current._id) }; // Id of the object that needs to be changed
@@ -485,7 +485,7 @@ app.put('/shelf', async (req, res) => { // Change the shelved state of a game fo
         await colli.updateOne(query, liked, options);// Updating the challenge
 
         // Send back success message
-        res.status(201).send(`shelved status of game with id ${req.body.gameId} successfully updated.`); // The succes message
+        res.status(201).send(`shelved status of game with id ${req.query.gameId} successfully updated.`); // The succes message
 
     }catch(error){ // A error catch
         console.log(error); // Log the error
