@@ -56,7 +56,7 @@ app.get('/users', async (req, res) =>{
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -98,7 +98,7 @@ app.get('/user', async (req, res) => { // Login with database credentials
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -141,7 +141,7 @@ app.post('/user', async (req, res) => { // Save user if not already in users
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -187,14 +187,13 @@ app.put('/user/name', async (req, res) => { // Change the name of a user
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
 // PUT /user/password
 app.put('/user/password', async (req, res) => { // Change the password of a user
     // Validation
-    console.log(req.body.name, req.body.password, req.body.newPassword);
     if(!req.body.name || !req.body.password || !req.body.newPassword || !req.body._id){ // Checks if the required name, password and newPassword are send
         res.status(400).send('Bad request: Missing name, password, newPassword'); // Sends back error if they are not send
         return; // return
@@ -227,7 +226,7 @@ app.put('/user/password', async (req, res) => { // Change the password of a user
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -269,7 +268,7 @@ app.delete('/user', async (req, res) => { // Change the password of a user
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -301,7 +300,7 @@ app.get('/likes', async (req, res) => { // Get all liked games of a certain user
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -346,7 +345,7 @@ app.post('/like', async (req, res) => { // Save a boardgame if not already in li
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -380,7 +379,7 @@ app.put('/like', async (req, res) => { // Change the liked state of a game for t
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -413,7 +412,7 @@ app.get('/shelved', async (req, res) => { // Get all shelved games of a certain 
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -458,7 +457,7 @@ app.post('/shelf', async (req, res) => { // Save a boardgame if not already in l
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -492,7 +491,7 @@ app.put('/shelf', async (req, res) => { // Change the shelved state of a game fo
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -520,7 +519,7 @@ app.get('/games', async (req, res) =>{ // Select all liked or shelved games
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -554,7 +553,7 @@ app.get('/game', async (req, res) => { // Check if a game is put in database bef
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
@@ -582,7 +581,7 @@ app.delete('/game', async (req, res) => { // Delete a likesAndShelf item
         res.status(500).send({ error: 'Something went wrong!', value: error }); // Send back that there has been an error
 
     }finally { // At the end
-        await client.close(); // close the database connection
+        // await client.close(); // close the database connection
     }
 });
 
